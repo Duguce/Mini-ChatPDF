@@ -62,7 +62,7 @@ def handle_exit():
     """
     Exit the program
     """
-    print("\n🤖 再见！\n")
+    print("🤖 Chatbot：Bye bye！\n")
     sys.exit(1)
 
 
@@ -73,5 +73,5 @@ def handle_save(title, history):
     with open(f"{title}.json", "w") as f:
         json.dump(history, f)
 
-    print(f"\n📝 保存成功！文件名：{title}.json\n")
+    print(f"📝 保存成功！文件名：{title}.json\n")
 

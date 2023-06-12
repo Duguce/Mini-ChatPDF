@@ -1,0 +1,5 @@
+openai==0.27.4
+tiktoken==0.4.0
+pandas==1.5.3
+fitz==0.0.1.dev2
+python-dotenv==1.0.0

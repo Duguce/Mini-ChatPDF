@@ -195,7 +195,7 @@ def chat(pdfs_path, model=models["gpt-3.5"]):
             if question == "exit":
                 handle_exit()
             if question == "save":
-                handle_save(str(history), history)
+                handle_save('example_history', history)
 
             # Calculate the similarity between the question and the text
             context, _ = cal_similarity(question, embeddings)
@@ -222,4 +222,3 @@ if __name__ == '__main__':
     initialize()
     pdfs_path = select_files()
     chat(pdfs_path)
-
