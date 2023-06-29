@@ -43,16 +43,10 @@ Here is a simple example:
 git@github.com:Duguce/Mini-ChatPDF.git && cd Mini-ChatPDF
 ```
 
-- Create a virtual environment
+- Create a virtual environment and install the required dependencies
 
 ```
 ./setup.sh
-```
-
-- Install the required dependencies
-
-```
-pip install -r requirements.txt
 ```
 
 - Set up environment variables
@@ -65,8 +59,10 @@ Add the PDF documents you want to use in the `./pdf_files/` directory.
 
 - Run the script
 
+You should see something like (.venv) like below. If not, first activate the virtual env by running `source .venv/bin/activate`
+
 ```
-python3 main.py
+(.vent) ~/Mini-ChatPDF$ python main.py
 ```
 
 - Start the conversation
