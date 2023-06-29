@@ -57,9 +57,16 @@ Obtain a GPT API key from [OpenAI](https://platform.openai.com/account/api-keys)
 
 Add the PDF documents you want to use in the `./pdf_files/` directory.
 
+
+- Activate the virtual environment
+
+```
+source .venv/bin/activate
+```
+
 - Run the script
 
-You should see something like (.venv) like below. If not, first activate the virtual env by running `source .venv/bin/activate`
+You should see something like `(.venv)` like below. If not, please first run `source .venv/bin/activate`
 
 ```
 (.vent) ~/Mini-ChatPDF$ python main.py
