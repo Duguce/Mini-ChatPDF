@@ -69,7 +69,7 @@ source .venv/bin/activate
 You should see something like `(.venv)` like below. If not, please first run `source .venv/bin/activate`
 
 ```
-(.vent) ~/Mini-ChatPDF$ python main.py
+(.venv) ~/Mini-ChatPDF$ python main.py
 ```
 
 - Start the conversation
