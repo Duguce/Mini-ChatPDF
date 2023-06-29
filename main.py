@@ -38,7 +38,7 @@ def extract_text(pdfs_path):
     Extract the text from the PDF files
     """
     cls()
-    print("📄 正在提取文本...")
+    print("📄 Extracting text...")
 
     # Create a list to store the extracted text
     extracted_text = []
@@ -94,7 +94,7 @@ def create_embeddings(text_df, model=models["embeddings"]):
     Create the embeddings for the text
     """
     cls()
-    print("🔍 正在生成嵌入向量...")
+    print("🔍 Generating embedding vectors...")
     # Add the number of tokens to the DataFrame
     text_df["n_tokens"] = text_df["text"].apply(lambda x: len(tokenizer.encode(x)))
     # Create a list to store the shortened text
@@ -130,7 +130,7 @@ def create_embeddings(text_df, model=models["embeddings"]):
 
 def cal_similarity(question, embeddings_df, model=models["embeddings"], max_len=1800):
     """
-    Calculate the similarity between the question and the text（return the most similar text）
+    Calculate the similarity between the question and the text (return the most similar text)
     """
     # Create a list to store the similarity scores
     similarity_df = pd.DataFrame()
@@ -168,14 +168,14 @@ def chat(pdfs_path, model=models["gpt-3.5"]):
     """
     Chat with the AI
     """
-    print("🤖 正在加载中...")
+    print("🤖 Loading...")
     # Extract the text from the PDF files
     text_df = extract_text(pdfs_path)
     # Create the embeddings for the text
     embeddings = create_embeddings(text_df)
 
     cls()
-    print("\n✅ 准备完成！让我们开始对话吧！")
+    print("\n✅ Preparation complete! Let's start the conversation!")
     print("🔍 Press Ctrl+C to exit")
 
     # Create the system prompt
@@ -191,7 +191,7 @@ def chat(pdfs_path, model=models["gpt-3.5"]):
         while True:
             tmp_message = []
             tmp_message.extend(history)
-            question = input("\n👩‍ User：")
+            question = input("\n👩‍ User: ")
             if question == "exit":
                 handle_exit()
             if question == "save":
@@ -210,7 +210,7 @@ def chat(pdfs_path, model=models["gpt-3.5"]):
                 model=model,
                 messages=tmp_message,
             )['choices'][0]["message"]["content"]
-            print(f"🤖 Chatbot：{res}")
+            print(f"🤖 Chatbot: {res}")
 
             # Append the completion to the history
             history.append({"role": "assistant", "content": res})

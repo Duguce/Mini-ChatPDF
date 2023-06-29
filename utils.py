@@ -36,7 +36,7 @@ def select_files():
     if not files:
         print("No PDF files in the folder")
         return None
-    print("📁 请选择要处理的文件：")
+    print("📁 Please select the file to process: ")
     for i, file in enumerate(files):
         print(f"{i + 1}. {file}")
     print()
@@ -44,7 +44,7 @@ def select_files():
     try:
         possible_selections = list(range(len(files) + 1))
 
-        selections = input("请输入文件序号，多个文件用空格分隔，或者输入0退出：").split()
+        selections = input("Please enter the file number, separate multiple files with spaces, or enter 0 to exit: ").split()
         selections = [int(selection) for selection in selections]
 
         if not set(selections).issubset(set(possible_selections)):
@@ -62,7 +62,7 @@ def handle_exit():
     """
     Exit the program
     """
-    print("🤖 Chatbot：Bye bye！\n")
+    print("🤖 Chatbot: Bye bye!\n")
     sys.exit(1)
 
 
@@ -73,5 +73,5 @@ def handle_save(title, history):
     with open(f"{title}.json", "w") as f:
         json.dump(history, f)
 
-    print(f"📝 保存成功！文件名：{title}.json\n")
+    print(f"📝 Save successful! Filename: {title}.json\n")
 
