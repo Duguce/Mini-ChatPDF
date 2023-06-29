@@ -66,10 +66,10 @@ source .venv/bin/activate
 
 - Run the script
 
-You should see something like `(.venv)` like below. If not, please first run `source .venv/bin/activate`
+You should see `(.venv) ~/Mini-ChatPDF$` when you run the script. If not, please first run `source .venv/bin/activate`
 
 ```
-(.venv) ~/Mini-ChatPDF$ python main.py
+python main.py
 ```
 
 - Start the conversation
