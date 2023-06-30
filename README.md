@@ -43,16 +43,10 @@ Here is a simple example:
 git@github.com:Duguce/Mini-ChatPDF.git && cd Mini-ChatPDF
 ```
 
-- Create a virtual environment
+- Create a virtual environment and install the required dependencies
 
 ```
 ./setup.sh
-```
-
-- Install the required dependencies
-
-```
-pip install -r requirements.txt
 ```
 
 - Set up environment variables
@@ -63,10 +57,19 @@ Obtain a GPT API key from [OpenAI](https://platform.openai.com/account/api-keys)
 
 Add the PDF documents you want to use in the `./pdf_files/` directory.
 
-- Run the script
+
+- Activate the virtual environment
 
 ```
-python3 main.py
+source .venv/bin/activate
+```
+
+- Run the script
+
+You should see `(.venv) ~/Mini-ChatPDF$` when you run the script. If not, please first run `source .venv/bin/activate`
+
+```
+python main.py
 ```
 
 - Start the conversation

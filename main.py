@@ -5,6 +5,7 @@
 # @File    : main.py
 # @Software: PyCharm
 import os
+import datetime
 import fitz
 import openai
 import tiktoken
@@ -38,7 +39,7 @@ def extract_text(pdfs_path):
     Extract the text from the PDF files
     """
     cls()
-    print("📄 正在提取文本...")
+    print("📄 Extracting text...")
 
     # Create a list to store the extracted text
     extracted_text = []
@@ -94,7 +95,7 @@ def create_embeddings(text_df, model=models["embeddings"]):
     Create the embeddings for the text
     """
     cls()
-    print("🔍 正在生成嵌入向量...")
+    print("🔍 Generating embedding vectors...")
     # Add the number of tokens to the DataFrame
     text_df["n_tokens"] = text_df["text"].apply(lambda x: len(tokenizer.encode(x)))
     # Create a list to store the shortened text
@@ -130,7 +131,7 @@ def create_embeddings(text_df, model=models["embeddings"]):
 
 def cal_similarity(question, embeddings_df, model=models["embeddings"], max_len=1800):
     """
-    Calculate the similarity between the question and the text（return the most similar text）
+    Calculate the similarity between the question and the text (return the most similar text)
     """
     # Create a list to store the similarity scores
     similarity_df = pd.DataFrame()
@@ -163,19 +164,34 @@ def cal_similarity(question, embeddings_df, model=models["embeddings"], max_len=
 
     return "\n\n###\n\n".join(context), similarity_df
 
+def process_single_pdf(file_path):
+    # Extract file name without extension
+    file_name = os.path.basename(file_path).split(".")[0]
+    file_dir = os.path.dirname(file_path)
+
+    # Look for the processed embedding file in the folder
+    embedding_file_path = os.path.join(file_dir, f"{file_name}_embed.pkl")
+    if os.path.exists(embedding_file_path):
+        # if found, load the file
+        embeddings_df = pd.read_pickle(embedding_file_path)
+        return embeddings_df
+
+    # If not found, process the file: extract text, create embeddings, and save
+    text_df = extract_text([file_path])
+    embeddings_df = create_embeddings(text_df)
+    embeddings_df.to_pickle(embedding_file_path)
+    return embeddings_df
 
 def chat(pdfs_path, model=models["gpt-3.5"]):
     """
     Chat with the AI
     """
-    print("🤖 正在加载中...")
-    # Extract the text from the PDF files
-    text_df = extract_text(pdfs_path)
-    # Create the embeddings for the text
-    embeddings = create_embeddings(text_df)
+    print("🤖 Loading...")
+    pdfs_embed = [process_single_pdf(pdf_path) for pdf_path in pdfs_path]
+    embeddings = pd.concat(pdfs_embed)
 
     cls()
-    print("\n✅ 准备完成！让我们开始对话吧！")
+    print("\n✅ Preparation complete! Let's start the conversation!")
     print("🔍 Press Ctrl+C to exit")
 
     # Create the system prompt
@@ -191,11 +207,13 @@ def chat(pdfs_path, model=models["gpt-3.5"]):
         while True:
             tmp_message = []
             tmp_message.extend(history)
-            question = input("\n👩‍ User：")
+            question = input("\n👩‍ User: ")
             if question == "exit":
                 handle_exit()
             if question == "save":
-                handle_save('example_history', history)
+                formatted_datetime = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+                handle_save(f"chat_history_{formatted_datetime}", history)
+                continue
 
             # Calculate the similarity between the question and the text
             context, _ = cal_similarity(question, embeddings)
@@ -210,7 +228,7 @@ def chat(pdfs_path, model=models["gpt-3.5"]):
                 model=model,
                 messages=tmp_message,
             )['choices'][0]["message"]["content"]
-            print(f"🤖 Chatbot：{res}")
+            print(f"🤖 Chatbot: {res}")
 
             # Append the completion to the history
             history.append({"role": "assistant", "content": res})
