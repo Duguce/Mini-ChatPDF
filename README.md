@@ -77,7 +77,7 @@ python3 main.py
 
 - [ ] Support other text encoding vector methods.
 
-- [ ] Add functionality to save text encoding vectors.
+- [x] Add functionality to save text encoding vectors.
 
 - [ ] Implement a graphical user interface (GUI).
 
