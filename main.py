@@ -5,6 +5,7 @@
 # @File    : main.py
 # @Software: PyCharm
 import os
+import datetime
 import fitz
 import openai
 import tiktoken
@@ -210,7 +211,9 @@ def chat(pdfs_path, model=models["gpt-3.5"]):
             if question == "exit":
                 handle_exit()
             if question == "save":
-                handle_save('example_history', history)
+                formatted_datetime = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+                handle_save(f"chat_history_{formatted_datetime}", history)
+                continue
 
             # Calculate the similarity between the question and the text
             context, _ = cal_similarity(question, embeddings)
