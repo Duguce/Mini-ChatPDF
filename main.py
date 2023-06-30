@@ -163,16 +163,31 @@ def cal_similarity(question, embeddings_df, model=models["embeddings"], max_len=
 
     return "\n\n###\n\n".join(context), similarity_df
 
+def process_single_pdf(file_path):
+    # Extract file name without extension
+    file_name = os.path.basename(file_path).split(".")[0]
+    file_dir = os.path.dirname(file_path)
+
+    # Look for the processed embedding file in the folder
+    embedding_file_path = os.path.join(file_dir, f"{file_name}_embed.pkl")
+    if os.path.exists(embedding_file_path):
+        # if found, load the file
+        embeddings_df = pd.read_pickle(embedding_file_path)
+        return embeddings_df
+
+    # If not found, process the file: extract text, create embeddings, and save
+    text_df = extract_text([file_path])
+    embeddings_df = create_embeddings(text_df)
+    embeddings_df.to_pickle(embedding_file_path)
+    return embeddings_df
 
 def chat(pdfs_path, model=models["gpt-3.5"]):
     """
     Chat with the AI
     """
     print("🤖 Loading...")
-    # Extract the text from the PDF files
-    text_df = extract_text(pdfs_path)
-    # Create the embeddings for the text
-    embeddings = create_embeddings(text_df)
+    pdfs_embed = [process_single_pdf(pdf_path) for pdf_path in pdfs_path]
+    embeddings = pd.concat(pdfs_embed)
 
     cls()
     print("\n✅ Preparation complete! Let's start the conversation!")
