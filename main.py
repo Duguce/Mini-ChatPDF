@@ -13,14 +13,17 @@ import pandas as pd
 from dotenv import load_dotenv
 from openai.embeddings_utils import distances_from_embeddings
 from utils import cls, handle_save, handle_exit, initialize, select_files
+import streamlit as st
 
 # Load the environment variables
 load_dotenv()
-openai.api_key = os.environ["OPENAI_API_KEY"]
+ 
+# openai.api_type = os.environ["OPENAI_API_TYPE"]
+# openai.api_version = os.environ["OPENAI_API_VERSION"]
 
 # The models to use
 models = {
-    "gpt-3.5": "gpt-3.5-turbo",
+    "gpt-4": "gpt-4",
     "embeddings": "text-embedding-ada-002"
 }
 
@@ -182,61 +185,59 @@ def process_single_pdf(file_path):
     embeddings_df.to_pickle(embedding_file_path)
     return embeddings_df
 
-def chat(pdfs_path, model=models["gpt-3.5"]):
-    """
-    Chat with the AI
-    """
-    print("🤖 Loading...")
+def chat(pdfs_path, model=models["gpt-4"]):
+    if not pdfs_path:
+        return
+
     pdfs_embed = [process_single_pdf(pdf_path) for pdf_path in pdfs_path]
     embeddings = pd.concat(pdfs_embed)
+    st.subheader("Ask the Chatbot About Your PDFs")
+    user_input = st.text_input(label="Enter your question:")
+    if user_input:
+        context, _ = cal_similarity(user_input, embeddings)
+        user_message = {"role": "user", "content": f"The pdf content:{context}, the question is: {user_input}"}
+        history.append({"role": "user", "content": user_input})
+        tmp_message = []
+        tmp_message.extend(history)
+        tmp_message.append(user_message)
+        res = openai.ChatCompletion.create(
+            engine=model,
+            model=model,
+            messages=tmp_message,
+        )['choices'][0]["message"]["content"]
+        st.info(f"{res}")
+        history.append({"role": "assistant", "content": res})
 
+def initialize_streamlit():
     cls()
-    print("\n✅ Preparation complete! Let's start the conversation!")
-    print("🔍 Press Ctrl+C to exit")
+    print("🌟 PDF Q&A Assistant 🌟")
+    print("\nYou can ask questions about the PDFs you provided!")
+    print("\nPowered by OpenAI GPT-4 Language Model")
 
-    # Create the system prompt
-    prompt = """You are a PDF document Q&A assistant.
-    Please answer the question as truthfully as possible using the provided text,
-    and if the answer is not contained within the text below, say "I don't know,
-     the answer is not contained within the text below."
 
-    """
-    system_message = {"role": "system", "content": prompt}
+def main():
+    initialize_streamlit()
+    pdfs_path = select_files()
 
-    try:
-        while True:
-            tmp_message = []
-            tmp_message.extend(history)
-            question = input("\n👩‍ User: ")
-            if question == "exit":
-                handle_exit()
-            if question == "save":
-                formatted_datetime = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-                handle_save(f"chat_history_{formatted_datetime}", history)
-                continue
+    with st.sidebar:
+        st.title("PDF Q&A Assistant Settings")
+        st.markdown("""
+            This tool allows you to ask questions about the content of your PDF files.
+            It uses the OpenAI GPT-4 Language Model to search for answers within your documents.
+        """)
 
-            # Calculate the similarity between the question and the text
-            context, _ = cal_similarity(question, embeddings)
-            # Create the user prompt
-            user_message = {"role": "user", "content": f"The pdf content:{context}, the question is: {question}"}
+        openai.api_key = st.text_input("Enter your OpenAI API Key:")
+        openai.api_base = st.text_input("Enter your OpenAI API Base URL (optional):",
+                                         "https://api.openai.com")
 
-            # Append the user question to the history
-            history.append({"role": "user", "content": question})
-            tmp_message.append(user_message)
-            # Create the completion
-            res = openai.ChatCompletion.create(
-                model=model,
-                messages=tmp_message,
-            )['choices'][0]["message"]["content"]
-            print(f"🤖 Chatbot: {res}")
+        global MAX_TOKENS
+        MAX_TOKENS = st.number_input("Enter the Max Tokens (default is 500):", value=500, step=1)
 
-            # Append the completion to the history
-            history.append({"role": "assistant", "content": res})
-    except KeyboardInterrupt:
-        handle_exit()
+    if openai.api_key:
+        chat(pdfs_path)
+    else:
+        st.warning("Please enter your OpenAI API Key in the sidebar to proceed.")
 
 
 if __name__ == '__main__':
-    initialize()
-    pdfs_path = select_files()
-    chat(pdfs_path)
+    main()

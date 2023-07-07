@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8  -*-
 # @Author  : Duguce 
 # @Email   : zhgyqc@163.com
@@ -7,6 +8,7 @@
 import os
 import sys
 import json
+import streamlit as st
 
 # PDF files path
 FILES = os.path.join(os.getcwd(), 'pdf_files')
@@ -28,34 +30,27 @@ def cls():
 
 
 def select_files():
-    """
-    Select the files
-    """
-    cls()
-    files = [file for file in os.listdir(FILES) if file.endswith('.pdf')]
-    if not files:
-        print("No PDF files in the folder")
+    st.title("PDF Q&A Assistant")
+    st.subheader("Please upload the PDFs you'd like to process")
+    uploaded_files = st.file_uploader("upload PDF files", accept_multiple_files=True, type=['pdf'], label_visibility='hidden')
+
+    if not uploaded_files:
+        st.warning("Please upload at least one PDF file to proceed.")
         return None
-    print("📁 Please select the file to process: ")
-    for i, file in enumerate(files):
-        print(f"{i + 1}. {file}")
-    print()
 
-    try:
-        possible_selections = list(range(len(files) + 1))
+    st.markdown("""---""")
 
-        selections = input("Please enter the file number, separate multiple files with spaces, or enter 0 to exit: ").split()
-        selections = [int(selection) for selection in selections]
+    os.makedirs(FILES, exist_ok=True)
 
-        if not set(selections).issubset(set(possible_selections)):
-            return select_files()
-        elif 0 in selections:
-            handle_exit()
-        else:
-            pdfs_path = [os.path.join(FILES, files[i - 1]) for i in selections]
-            return pdfs_path
-    except ValueError:
-        return select_files()
+    pdfs_path = []
+    for uploaded_file in uploaded_files:
+        file_path = os.path.join(FILES, uploaded_file.name)
+        pdfs_path.append(file_path)
+
+        with open(file_path, "wb") as f:
+            f.write(uploaded_file.getbuffer())
+
+    return pdfs_path
 
 
 def handle_exit():
