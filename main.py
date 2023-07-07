@@ -226,7 +226,7 @@ def main():
             It uses the OpenAI GPT-4 Language Model to search for answers within your documents.
         """)
 
-        openai.api_key = st.text_input("Enter your OpenAI API Key:")
+        openai.api_key = st.text_input("Enter your OpenAI API Key:", type="password")
         openai.api_base = st.text_input("Enter your OpenAI API Base URL (optional):",
                                          "https://api.openai.com")
 
